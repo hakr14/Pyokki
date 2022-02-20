@@ -1,5 +1,5 @@
 import pygame
-import sys
+from sys import exit
 
 class Base:
     def __init__(self, width: int = 512, height: int = 512, name: str = "Graphics Window"):
@@ -29,7 +29,7 @@ class Base:
             pygame.display.flip()
             self.clock.tick(60)
         pygame.quit()
-        sys.exit(0)
+        exit(0)
 
 class Input:
     def __init__(self):
