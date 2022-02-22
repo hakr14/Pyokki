@@ -9,6 +9,9 @@ class Base:
         pygame.init()
         self.size = self.width, self.height = width, height
         self.flags = pygame.DOUBLEBUF | pygame.OPENGL
+        pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLEBUFFERS, 1)
+        pygame.display.gl_set_attribute(pygame.GL_MULTISAMPLESAMPLES, 4)
+        pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK, pygame.GL_CONTEXT_PROFILE_CORE)
         self.screen = pygame.display.set_mode(self.size, self.flags)
         pygame.display.set_caption(caption)
         self.running = True
@@ -73,3 +76,31 @@ class Attribute:
         else:
             raise ValueError(f"Variable type {self.data_type} not recognized.")
         glEnableVertexAttribArray(var_ref)
+
+class Uniform:
+    def __init__(self, data_type: str, data: Iterable | int | float):
+        self.data_type = data_type
+        self.data = data
+        self.var = None
+
+    def locate_variable(self, prog_ref, var_name: str):
+        self.var = glGetUniformLocation(prog_ref, var_name)
+        if self.var == -1:
+            self.var = None
+            raise NameError(f"Variable {var_name} not found.")
+
+    def upload_data(self):
+        if self.var is None:
+            raise UnboundLocalError("Variable reference not set.")
+        if self.data_type == "int" or self.data_type == "bool":
+            glUniform1i(self.var, self.data)
+        elif self.data_type == "float":
+            glUniform1f(self.var, self.data)
+        elif self.data_type == "vec2":
+            glUniform2f(self.var, *self.data)
+        elif self.data_type == "vec3":
+            glUniform3f(self.var, *self.data)
+        elif self.data_type == "vec4":
+            glUniform4f(self.var, *self.data)
+        else:
+            raise ValueError(f"Variable type {self.data_type} not recognized.")

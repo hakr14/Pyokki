@@ -2,7 +2,7 @@ from OpenGL.GL import *
 from OpenGL.constant import Constant
 
 def compile_shader(code: str, shader_type: Constant):
-    header = "#version 130\n#extension GL_ARB_shading_language_420pack: require\n"
+    header = "#version 330\n"
     ref = glCreateShader(shader_type)
     glShaderSource(ref, header + code)
     glCompileShader(ref)
