@@ -40,11 +40,31 @@ class Base:
 class Input:
     def __init__(self):
         self.quit = False
+        self.keys_down = self.keys_pressed = self.keys_up = set()
 
     def update(self):
+        self.keys_down = self.keys_up = set()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.quit = True
+            elif event.type == pygame.KEYDOWN:
+                self.keys_down.add(event.key)
+                self.keys_pressed.add(event.key)
+            elif event.type == pygame.KEYUP:
+                self.keys_up.add(event.key)
+                try:
+                    self.keys_pressed.remove(event.key)
+                except KeyError:
+                    pass
+
+    def is_key_down(self, key_name: str):
+        return key_name in map(pygame.key.name, self.keys_down)
+
+    def is_key_pressed(self, key_name: str):
+        return key_name in map(pygame.key.name, self.keys_pressed)
+
+    def is_key_up(self, key_name: str):
+        return key_name in map(pygame.key.name, self.keys_up)
 
 class Attribute:
     def __init__(self, data_type: str, data: Iterable | int | float):

@@ -1,6 +1,5 @@
 from core import Attribute, Base, Uniform
 from core.OpenGLUtil import *
-from math import sin
 from OpenGL.GL import *
 
 class App(Base):
@@ -19,43 +18,36 @@ class App(Base):
             }
         """
         fg_code = """
-            uniform vec3 baseColor;
             out vec4 fragColor;
             void main(){
-                fragColor = vec4(baseColor.r, baseColor.g, baseColor.b, 1);
+                fragColor = vec4(1, 1, 0, 1);
             }
         """
         self.program = initialize_program(vs_code, fg_code)
         vao = glGenVertexArrays(1)
         glBindVertexArray(vao)
-        pos = [[0, 0.2], [0.2, -0.2], [-0.2, -0.2]]
-        self.vertex_count = len(pos)
-        pos_attr = Attribute("vec2", pos)
-        pos_attr.assoc_var(self.program, "position")
-        self.trans1 = Uniform("vec2", [-0.5, 0])
-        self.trans1.locate_variable(self.program, "translation")
-        self.trans2 = Uniform("vec2", [0.5, 0])
-        self.trans2.locate_variable(self.program, "translation")
-        self.color1 = Uniform("vec3", [1, 0, 0])
-        self.color1.locate_variable(self.program, "baseColor")
-        self.color2 = Uniform("vec3", [0, 0, 1])
-        self.color2.locate_variable(self.program, "baseColor")
-        self.time = 0
+        positions = [[0, 0.2], [0.2, -0.2], [-0.2, -0.2]]
+        pos = Attribute("vec2", positions)
+        pos.assoc_var(self.program, "position")
+        self.count = len(positions)
+        self.trans = Uniform("vec2", [0, 0])
+        self.trans.locate_variable(self.program, "translation")
 
+    # noinspection PyUnresolvedReferences
     def update(self):
         glUseProgram(self.program)
         glClear(GL_COLOR_BUFFER_BIT)
-        self.time += self.clock.get_time()
-
-        # noinspection PyUnresolvedReferences
-        self.trans2.data[1] = sin(self.time/1000)*0.6
-
-        self.trans1.upload_data()
-        self.color1.upload_data()
-        glDrawArrays(GL_TRIANGLES, 0, self.vertex_count)
-        self.trans2.upload_data()
-        self.color2.upload_data()
-        glDrawArrays(GL_TRIANGLES, 0, self.vertex_count)
+        move_speed = 0.0075
+        if self.input.is_key_pressed("left"):
+            self.trans.data[0] -= move_speed
+        if self.input.is_key_pressed("right"):
+            self.trans.data[0] += move_speed
+        if self.input.is_key_pressed("down"):
+            self.trans.data[1] -= move_speed
+        if self.input.is_key_pressed("up"):
+            self.trans.data[1] += move_speed
+        self.trans.upload_data()
+        glDrawArrays(GL_TRIANGLES, 0, self.count)
 
 if __name__ == "__main__":
     App().run()
