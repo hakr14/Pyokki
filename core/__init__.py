@@ -5,7 +5,7 @@ from sys import exit
 from typing import Iterable
 
 class Base:
-    def __init__(self, width: int = 512, height: int = 512, caption: str = "Graphics Window"):
+    def __init__(self, width: int = 512, height: int = 512, caption: str = "Graphics Window", icon_path: str | None = None):
         pygame.init()
         self.size = self.width, self.height = width, height
         self.flags = pygame.DOUBLEBUF | pygame.OPENGL
@@ -14,6 +14,9 @@ class Base:
         pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK, pygame.GL_CONTEXT_PROFILE_CORE)
         self.screen = pygame.display.set_mode(self.size, self.flags)
         pygame.display.set_caption(caption)
+        if icon_path is not None:
+            icon = pygame.image.load(icon_path)
+            pygame.display.set_icon(icon)
         self.running = True
         self.clock = pygame.time.Clock()
         self.input = Input()
@@ -122,5 +125,9 @@ class Uniform:
             glUniform3f(self.var, *self.data)
         elif self.data_type == "vec4":
             glUniform4f(self.var, *self.data)
+        elif self.data_type == "mat3":
+            glUniformMatrix3fv(self.var, 1, GL_TRUE, self.data)
+        elif self.data_type == "mat4":
+            glUniformMatrix4fv(self.var, 1, GL_TRUE, self.data)
         else:
             raise ValueError(f"Variable type {self.data_type} not recognized.")
