@@ -65,7 +65,9 @@ def scale3d(x: int | float, y: int | float | None = None, z: int | float | None 
         if y is None:
             z = y = x
         else:
-            return scale2d(x, y)
+            raise NotImplementedError("Please use scale2d")
+    elif y is None:
+        raise TypeError("y must be defined if z is defined")
     return np.array([[x, 0, 0, 0],
                      [0, y, 0, 0],
                      [0, 0, z, 0],

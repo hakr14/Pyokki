@@ -101,7 +101,7 @@ class Attribute:
         glEnableVertexAttribArray(var_ref)
 
 class Uniform:
-    def __init__(self, data_type: str, data: Iterable | int | float):
+    def __init__(self, data_type: str, data: Iterable | int | float | np.ndarray):
         self.data_type = data_type
         self.data = data
         self.var = None
