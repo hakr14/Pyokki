@@ -2,7 +2,6 @@ import numpy as np
 from OpenGL.GL import *
 import pygame
 from sys import exit
-from typing import Iterable
 
 class Base:
     def __init__(self, width: int = 512, height: int = 512, caption: str = "Graphics Window", icon_path: str | None = None):
@@ -70,7 +69,7 @@ class Input:
         return key_name in map(pygame.key.name, self.keys_up)
 
 class Attribute:
-    def __init__(self, data_type: str, data: Iterable | int | float):
+    def __init__(self, data_type: str, data: list | tuple | int | float):
         self.data_type = data_type
         self.data = data
         self.buffer = glGenBuffers(1)
@@ -101,7 +100,7 @@ class Attribute:
         glEnableVertexAttribArray(var_ref)
 
 class Uniform:
-    def __init__(self, data_type: str, data: Iterable | int | float | np.ndarray):
+    def __init__(self, data_type: str, data: list | tuple | int | float | np.ndarray | None):
         self.data_type = data_type
         self.data = data
         self.var = None

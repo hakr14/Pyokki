@@ -1,6 +1,8 @@
-import util
-from core import Base
-from core.matrices import *
+from render import Base, matrices
+from render.geometry import Box
+from render.materials import SurfaceBasicMaterial
+from render.objects import Camera, Mesh, Scene
+from render.render import Renderer
 
 class App(Base):
     def __init__(self):
@@ -9,12 +11,19 @@ class App(Base):
     # noinspection PyAttributeOutsideInit
     def initialize(self):
         print("Starting Pyokki!")
-        m = translation2d(4, 5) @ rotation(pi/3) @ scale2d(1.5)
-        print(util.convert_2d_3d(m))
-        print(m)
+        self.renderer = Renderer()
+        self.scene = Scene()
+        self.camera = Camera()
+        geo = Box()
+        mat = SurfaceBasicMaterial({"useVertexColors": 1})
+        self.mesh = Mesh(geo, mat)
+        self.scene.add(self.mesh)
+        self.camera.set_position(0, 0, 4)
 
     def update(self):
-        pass
+        self.mesh.apply_transformation(matrices.x_rotation(0.04))
+        self.mesh.apply_transformation(matrices.y_rotation(0.015))
+        self.renderer.render(self.scene, self.camera)
 
 if __name__ == "__main__":
     App().run()

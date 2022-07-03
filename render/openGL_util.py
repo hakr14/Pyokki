@@ -12,9 +12,9 @@ def compile_shader(code: str, shader_type: Constant):
         raise SyntaxError("Shader Error:\n" + message.decode("utf-8"))
     return ref
 
-def initialize_program(vsCode: str, fgCode: str):
-    vsID = compile_shader(vsCode, GL_VERTEX_SHADER)
-    fgID = compile_shader(fgCode, GL_FRAGMENT_SHADER)
+def initialize_program(vs_code: str, fs_code: str):
+    vsID = compile_shader(vs_code, GL_VERTEX_SHADER)
+    fgID = compile_shader(fs_code, GL_FRAGMENT_SHADER)
     programID = glCreateProgram()
     glAttachShader(programID, vsID)
     glAttachShader(programID, fgID)
