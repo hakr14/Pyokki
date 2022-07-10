@@ -1,5 +1,5 @@
 from render import Base, matrices
-from render.geometry import Box
+from render.geometry import Cylindrical
 from render.materials import SurfaceBasicMaterial
 from render.objects import Camera, Mesh, Scene
 from render.render import Renderer
@@ -14,8 +14,8 @@ class App(Base):
         self.renderer = Renderer()
         self.scene = Scene()
         self.camera = Camera()
-        geo = Box()
-        mat = SurfaceBasicMaterial({"useVertexColors": 1})
+        geo = Cylindrical(x_rad_top = 1.5, x_rad_bottom = 0.5, z_rad_top = -0.3, z_rad_bottom = 2, height = 1.75)
+        mat = SurfaceBasicMaterial({"useVertexColors": 1, "doubleSided": 1})
         self.mesh = Mesh(geo, mat)
         self.scene.add(self.mesh)
         self.camera.set_position(0, 0, 4)

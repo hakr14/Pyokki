@@ -1,4 +1,7 @@
+from math import cos, sin, pi
+from numpy import linspace
 from render import Attribute
+from typing import Callable
 
 class Geometry:
     def __init__(self):
@@ -11,6 +14,9 @@ class Geometry:
                 self.vertex_count = len(v.data)
                 return
         raise RuntimeError("No sized attribute found")
+
+    def add_attribute(self, data_type: str, var_name: str, data: list|tuple|int|float):
+        self.attributes[var_name] = Attribute(data_type, data)
 
 class Rectangle(Geometry):
     def __init__(self, width = 1, height = 1):
@@ -25,8 +31,18 @@ class Rectangle(Geometry):
         c3 = [1, 1, 0]
         pos = [p0, p1, p3, p0, p3, p2]
         col = [c0, c1, c3, c0, c3, c2]
-        self.attributes["vertexPosition"] = Attribute("vec3", pos)
-        self.attributes["vertexColor"] = Attribute("vec3", col)
+        self.add_attribute("vec3", "vertexPosition", pos)
+        self.add_attribute("vec3", "vertexColor", col)
+        self.count_vertices()
+
+class Polygon(Geometry):
+    def __init__(self, sides: int = 6, rad: float = 1):
+        super().__init__()
+        a = 2 * pi / sides
+        pos = [p for s in range(sides) for p in [[0, 0, 0], [rad*cos(s*a), rad*sin(s*a), 0], [rad*cos((s+1)*a), rad*sin((s+1)*a), 0]]]
+        col = [[1, 1, 1], [0.75, 0.75, 0.75], [0.75, 0.75, 0.75]] * sides
+        self.add_attribute("vec3", "vertexPosition", pos)
+        self.add_attribute("vec3", "vertexColor", col)
         self.count_vertices()
 
 class Box(Geometry):
@@ -60,6 +76,61 @@ class Box(Geometry):
                c0, c1, c5, c0, c5, c4,
                c4, c5, c7, c4, c7, c6,
                c1, c0, c2, c1, c2, c3]
-        self.attributes["vertexPosition"] = Attribute("vec3", pos)
-        self.attributes["vertexColor"] = Attribute("vec3", col)
+        self.add_attribute("vec3", "vertexPosition", pos)
+        self.add_attribute("vec3", "vertexColor", col)
         self.count_vertices()
+
+class Parametric(Geometry):
+    def __init__(self, us: float, ue: float, ur: int, vs: float, ve: float, vr: int, func: Callable[[float, float], list[float]]):
+        super().__init__()
+        grid = [[func(u, v) for v in linspace(vs, ve, vr + 1)] for u in linspace(us, ue, ur + 1)]
+        pos = []
+        for x in range(ur):
+            for y in range(vr):
+                a = grid[x][y]
+                b = grid[x+1][y]
+                c = grid[x+1][y+1]
+                d = grid[x][y+1]
+                pos.extend([a, b, c, a, c, d])
+        col = [[1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 1, 1], [1, 0, 1], [1, 1, 0]] * ur * vr
+        self.add_attribute("vec3", "vertexPosition", pos)
+        self.add_attribute("vec3", "vertexColor", col)
+        self.count_vertices()
+
+class Plane(Parametric):
+    def __init__(self, width: float = 1, height: float = 1, w_sub: int = 50, h_sub: int = 50):
+        def func(u: float, v: float):
+            return [u, v, 0]
+        super().__init__(-width / 2, width / 2, w_sub, -height / 2, height / 2, h_sub, func)
+
+class Ellipsoid(Parametric):
+    def __init__(self, x_rad: float = 1, y_rad: float = 1, z_rad: float = 1, ur = 50, vr = 50):
+        def func(u: float, v: float):
+            return [x_rad * sin(u) * cos(v), y_rad * sin(v), z_rad * cos(u) * cos(v)]
+        super().__init__(0, 2*pi, ur, 0, 2*pi, vr, func)
+
+class Sphere(Ellipsoid):
+    def __init__(self, radius = 1, ur = 50, vr = 50):
+        super().__init__(radius, radius, radius, ur, vr)
+
+class Cylindrical(Parametric):
+    def __init__(self, x_rad_top: float = 1, x_rad_bottom: float = 1, z_rad_top: float = 1, z_rad_bottom: float = 1, height: float = 1, res = 50):
+        def func(u: float, v: float):
+            return [(v * x_rad_top + (1-v) * x_rad_bottom) * sin(u), height * (v - 0.5), (v * z_rad_top + (1-v) * z_rad_bottom) * cos(u)]
+        super().__init__(0, 2*pi, res, 0, 1, 1, func)
+
+class Cylinder(Cylindrical):
+    def __init__(self, radius: float = 1, height: float = 1, res = 50):
+        super().__init__(radius, radius, radius, radius, height, res)
+
+class Prism(Cylindrical):
+    def __init__(self, radius: float = 1, height: float = 1, sides = 4):
+        super().__init__(radius, radius, radius, radius, height, sides)
+
+class Cone(Cylindrical):
+    def __init__(self, radius: float = 1, height: float = 1, res = 50):
+        super().__init__(0, radius, 0, radius, height, res)
+
+class Pyramid(Cylindrical):
+    def __init__(self, radius: float = 1, height: float = 1, sides = 4):
+        super().__init__(0, radius, 0, radius, height, sides)
