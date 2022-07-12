@@ -1,7 +1,7 @@
-from render import Base, matrices
+from render import Base
 from render.geometry import Cylindrical
 from render.materials import SurfaceBasicMaterial
-from render.objects import Camera, Mesh, Scene
+from render.objects import Camera, Controller, Mesh, Scene
 from render.render import Renderer
 
 class App(Base):
@@ -18,11 +18,17 @@ class App(Base):
         mat = SurfaceBasicMaterial({"useVertexColors": 1, "doubleSided": 1})
         self.mesh = Mesh(geo, mat)
         self.scene.add(self.mesh)
-        self.camera.set_position(0, 0, 4)
+        self.move = Controller({Controller.Moves.FORWARD: "w", Controller.Moves.BACK: "s",
+                                Controller.Moves.LEFT: "a", Controller.Moves.RIGHT: "d",
+                                Controller.Moves.TURN_LEFT: "q", Controller.Moves.TURN_RIGHT: "e",
+                                Controller.Moves.UP: "r", Controller.Moves.DOWN: "f",
+                                Controller.Moves.LOOK_UP: "t", Controller.Moves.LOOK_DOWN: "g"})
+        self.move.add(self.camera)
+        self.scene.add(self.move)
+        self.move.set_position(0, 0, 4)
 
     def update(self):
-        self.mesh.apply_transformation(matrices.x_rotation(0.04))
-        self.mesh.apply_transformation(matrices.y_rotation(0.015))
+        self.move.update(self.input, self.delta)
         self.renderer.render(self.scene, self.camera)
 
 if __name__ == "__main__":

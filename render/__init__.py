@@ -4,7 +4,7 @@ import pygame
 from sys import exit
 
 class Base:
-    def __init__(self, width: int = 512, height: int = 512, caption: str = "Graphics Window", icon_path: str | None = None):
+    def __init__(self, width: int = 512, height: int = 512, caption: str = "Graphics Window", icon_path: str | None = None, max_fps: int = 60):
         pygame.init()
         self.size = self.width, self.height = width, height
         self.flags = pygame.DOUBLEBUF | pygame.OPENGL
@@ -19,6 +19,8 @@ class Base:
         self.running = True
         self.clock = pygame.time.Clock()
         self.input = Input()
+        self.max_fps = max_fps
+        self.delta = 1 / max_fps
 
     def initialize(self):
         raise NotImplementedError()
@@ -35,7 +37,7 @@ class Base:
                 break
             self.update()
             pygame.display.flip()
-            self.clock.tick(60)
+            self.delta = self.clock.tick(self.max_fps) / 1000
         pygame.quit()
         exit(0)
 
@@ -59,17 +61,17 @@ class Input:
                 except KeyError:
                     pass
 
-    def is_key_down(self, key_name: str):
+    def is_key_down(self, key_name: str | None):
         return key_name in map(pygame.key.name, self.keys_down)
 
-    def is_key_pressed(self, key_name: str):
+    def is_key_pressed(self, key_name: str | None):
         return key_name in map(pygame.key.name, self.keys_pressed)
 
-    def is_key_up(self, key_name: str):
+    def is_key_up(self, key_name: str | None):
         return key_name in map(pygame.key.name, self.keys_up)
 
 class Attribute:
-    def __init__(self, data_type: str, data: list | tuple | int | float):
+    def __init__(self, data_type: str, data: list | tuple | float):
         self.data_type = data_type
         self.data = data
         self.buffer = glGenBuffers(1)
@@ -100,7 +102,7 @@ class Attribute:
         glEnableVertexAttribArray(var_ref)
 
 class Uniform:
-    def __init__(self, data_type: str, data: list | tuple | int | float | np.ndarray | None):
+    def __init__(self, data_type: str, data: list | tuple | float | np.ndarray | None):
         self.data_type = data_type
         self.data = data
         self.var = None
