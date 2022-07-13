@@ -5,6 +5,8 @@ class Renderer:
     def __init__(self, clear_color = (0, 0, 0)):
         glEnable(GL_DEPTH_TEST)
         glClearColor(*clear_color, 1)
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
     @staticmethod
     def render(scene: Scene, camera: Camera):

@@ -1,6 +1,7 @@
-from render import Uniform
-from render.openGL_util import initialize_program
 from OpenGL import GL
+from OpenGL.constant import Constant
+from render import Texture, Uniform
+from render.openGL_util import initialize_program
 from typing import Any
 
 class Material:
@@ -27,6 +28,9 @@ class Material:
                     self.settings[name] = data
                 else:
                     raise RuntimeError("Material has no property", name)
+
+    def add_uniform(self, data_type: str, name: str, data):
+        self.uniforms[name] = Uniform(data_type, data)
 
 class BasicMaterial(Material):
     def __init__(self):
@@ -55,7 +59,7 @@ class BasicMaterial(Material):
             }
         """
         super().__init__(vs_code, fs_code)
-        self.uniforms["baseColor"] = Uniform("vec3", [1, 1, 1])
+        self.uniforms["baseColor"] = Uniform("vec3", (1, 1, 1))
         self.uniforms["useVertexColors"] = Uniform("bool", 0)
         self.locate_uniforms()
 
@@ -99,7 +103,6 @@ class LineBasicMaterial(BasicMaterial):
 class SurfaceBasicMaterial(BasicMaterial):
     def __init__(self, properties = None):
         super().__init__()
-        self.settings["drawStyle"] = GL.GL_TRIANGLES
         self.settings["doubleSided"] = False
         self.settings["wireframe"] = False
         self.settings["lineWidth"] = 2
@@ -115,3 +118,52 @@ class SurfaceBasicMaterial(BasicMaterial):
         else:
             GL.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL)
         GL.glLineWidth(self.settings["lineWidth"])
+
+class TextureMaterial(Material):
+    def __init__(self, tex: Texture, properties: dict[str, Constant] = None):
+        vs_code = """
+            uniform mat4 projectionMatrix;
+            uniform mat4 viewMatrix;
+            uniform mat4 modelMatrix;
+            in vec3 vertexPosition;
+            in vec2 vertexUV;
+            out vec2 uv;
+            void main(){
+                gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1);
+                uv = vec2(vertexUV.s, 1 - vertexUV.t);
+            }
+        """
+        fs_code = """
+            uniform vec3 baseColor;
+            uniform sampler2D texture;
+            in vec2 uv;
+            out vec4 fragColor;
+            void main(){
+                fragColor = vec4(baseColor, 1) * texture2D(texture, uv);
+            }
+        """
+        super().__init__(vs_code, fs_code)
+        self.add_uniform("vec3", "baseColor", (1, 1, 1))
+        self.add_uniform("sampler2D", "texture", (tex.tex, 1))
+        self.locate_uniforms()
+        self.settings["drawStyle"] = GL.GL_TRIANGLES
+        self.settings["doubleSided"] = False
+        self.settings["wireframe"] = False
+        self.settings["lineWidth"] = 1
+        self.settings["insideOut"] = False
+        self.set_properties(properties)
+
+    def render_settings(self):
+        if self.settings["doubleSided"]:
+            GL.glDisable(GL.GL_CULL_FACE)
+        else:
+            GL.glEnable(GL.GL_CULL_FACE)
+        if self.settings["wireframe"]:
+            GL.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_LINE)
+        else:
+            GL.glPolygonMode(GL.GL_FRONT_AND_BACK, GL.GL_FILL)
+        GL.glLineWidth(self.settings["lineWidth"])
+        if self.settings["insideOut"]:
+            GL.glFrontFace(GL.GL_CW)
+        else:
+            GL.glFrontFace(GL.GL_CCW)

@@ -1,7 +1,7 @@
 import numpy as np
 from OpenGL.GL import *
 import pygame
-from sys import exit
+from sys import exit, stderr
 
 class Base:
     def __init__(self, width: int = 512, height: int = 512, caption: str = "Graphics Window", icon_path: str | None = None, max_fps: int = 60):
@@ -85,7 +85,8 @@ class Attribute:
     def assoc_var(self, prog_ref, var_name: str):
         var_ref = glGetAttribLocation(prog_ref, var_name)
         if var_ref == -1:
-            raise NameError(f"Variable {var_name} not found.")
+            print(f"Variable {var_name} not found.", file = stderr)
+            return
         glBindBuffer(GL_ARRAY_BUFFER, self.buffer)
         if self.data_type == "int":
             glVertexAttribPointer(var_ref, 1, GL_INT, False, 0, None)
@@ -126,9 +127,44 @@ class Uniform:
             glUniform3f(self.var, *self.data)
         elif self.data_type == "vec4":
             glUniform4f(self.var, *self.data)
-        elif self.data_type == "mat3":
-            glUniformMatrix3fv(self.var, 1, GL_TRUE, self.data)
         elif self.data_type == "mat4":
             glUniformMatrix4fv(self.var, 1, GL_TRUE, self.data)
+        elif self.data_type == "sampler2D":
+            obj, unit = self.data
+            glActiveTexture(GL_TEXTURE0 + unit)
+            glBindTexture(GL_TEXTURE_2D, obj)
+            glUniform1i(self.var, unit)
         else:
             raise ValueError(f"Variable type {self.data_type} not recognized.")
+
+class Texture:
+    def __init__(self, filename: str = None, properties: dict[str, Constant] = None):
+        self.surface: pygame.surface.Surface | None = None
+        self.tex = glGenTextures(1)
+        self.properties = {"magFilter": GL_LINEAR, "minFilter": GL_LINEAR_MIPMAP_LINEAR, "wrap": GL_CLAMP_TO_BORDER}
+        self.set_properties(properties)
+        if filename is not None:
+            self.load_image(filename)
+            self.upload()
+
+    def load_image(self, filename: str):
+        self.surface = pygame.image.load(filename)
+
+    def set_properties(self, properties):
+        if properties is not None:
+            for k, v in properties.items():
+                if k in self.properties.keys():
+                    self.properties[k] = v
+                else:
+                    raise RuntimeError("Texture has no property", k)
+
+    def upload(self):
+        w, h = self.surface.get_size()
+        data = pygame.image.tostring(self.surface, "RGBA")
+        glBindTexture(GL_TEXTURE_2D, self.tex)
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data)
+        glGenerateMipmap(GL_TEXTURE_2D)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, self.properties["magFilter"])
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, self.properties["minFilter"])
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, self.properties["wrap"])
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, self.properties["wrap"])

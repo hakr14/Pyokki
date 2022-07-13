@@ -1,6 +1,6 @@
-from render import Base
-from render.geometry import Cylindrical
-from render.materials import SurfaceBasicMaterial
+from render import Base, Texture
+from render.geometry import Polygon
+from render.materials import TextureMaterial
 from render.objects import Camera, Controller, Mesh, Scene
 from render.render import Renderer
 
@@ -11,11 +11,12 @@ class App(Base):
     # noinspection PyAttributeOutsideInit
     def initialize(self):
         print("Starting Pyokki!")
-        self.renderer = Renderer()
+        self.renderer = Renderer((1, 1, 1))
         self.scene = Scene()
         self.camera = Camera()
-        geo = Cylindrical(x_rad_top = 1.5, x_rad_bottom = 0.5, z_rad_top = -0.3, z_rad_bottom = 2, height = 1.75)
-        mat = SurfaceBasicMaterial({"useVertexColors": 1, "doubleSided": 1})
+        geo = Polygon()
+        tex = Texture("images/logo.png")
+        mat = TextureMaterial(tex)
         self.mesh = Mesh(geo, mat)
         self.scene.add(self.mesh)
         self.move = Controller({Controller.Moves.FORWARD: "w", Controller.Moves.BACK: "s",
