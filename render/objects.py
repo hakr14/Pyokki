@@ -3,9 +3,11 @@ from math import pi
 from numpy import ndarray
 from numpy.linalg import inv
 from OpenGL import GL
-from render import Input, matrices
-from render.geometry import Geometry
-from render.materials import Material
+from operator import truediv
+from pygame.font import Font
+from render import Input, matrices, Texture
+from render.geometry import Geometry, Rectangle
+from render.materials import Material, TextureMaterial
 
 class Object3d:
     def __init__(self):
@@ -172,3 +174,11 @@ class Controller(Object3d):
             self.looker.z_rotation(ta, self.local)
         if inputs.is_key_pressed(self.keys[Controller.Moves.LOOK_TILT_RIGHT]):
             self.looker.z_rotation(-ta, self.local)
+
+class Text(Mesh):
+    def __init__(self, text: str, font: str = "fonts/verdana.ttf", height: float = 1, color: tuple[int, int, int, int] = (0, 0, 0, 255)):
+        surface = Font(font, 72 * height).render(text, True, color)
+        tex = Texture()
+        tex.load_image(surface)
+        tex.upload()
+        super().__init__(Rectangle(truediv(*surface.get_size()) * height, height), TextureMaterial(tex))

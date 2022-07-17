@@ -1,3 +1,4 @@
+from enum import Enum
 import numpy as np
 from OpenGL.GL import *
 import pygame
@@ -71,7 +72,14 @@ class Input:
         return key_name in map(pygame.key.name, self.keys_up)
 
 class Attribute:
-    def __init__(self, data_type: str, data: list | tuple | float):
+    class Type(Enum):
+        INT   = 1
+        FLOAT = 2
+        VEC2  = 3
+        VEC3  = 4
+        VEC4  = 5
+
+    def __init__(self, data_type: Type, data: list | tuple | float):
         self.data_type = data_type
         self.data = data
         self.buffer = glGenBuffers(1)
@@ -88,22 +96,32 @@ class Attribute:
             print(f"Variable {var_name} not found.", file = stderr)
             return
         glBindBuffer(GL_ARRAY_BUFFER, self.buffer)
-        if self.data_type == "int":
+        if self.data_type is Attribute.Type.INT:
             glVertexAttribPointer(var_ref, 1, GL_INT, False, 0, None)
-        elif self.data_type == "float":
+        elif self.data_type is Attribute.Type.FLOAT:
             glVertexAttribPointer(var_ref, 1, GL_FLOAT, False, 0, None)
-        elif self.data_type == "vec2":
+        elif self.data_type is Attribute.Type.VEC2:
             glVertexAttribPointer(var_ref, 2, GL_FLOAT, False, 0, None)
-        elif self.data_type == "vec3":
+        elif self.data_type is Attribute.Type.VEC3:
             glVertexAttribPointer(var_ref, 3, GL_FLOAT, False, 0, None)
-        elif self.data_type == "vec4":
+        elif self.data_type is Attribute.Type.VEC4:
             glVertexAttribPointer(var_ref, 4, GL_FLOAT, False, 0, None)
         else:
             raise ValueError(f"Variable type {self.data_type} not recognized.")
         glEnableVertexAttribArray(var_ref)
 
 class Uniform:
-    def __init__(self, data_type: str, data: list | tuple | float | np.ndarray | None):
+    class Type(Enum):
+        INT       = 1
+        BOOL      = 1
+        FLOAT     = 2
+        VEC2      = 3
+        VEC3      = 4
+        VEC4      = 5
+        MAT4      = 6
+        SAMPLER2D = 7
+
+    def __init__(self, data_type: Type, data: list | tuple | float | np.ndarray | None):
         self.data_type = data_type
         self.data = data
         self.var = None
@@ -117,19 +135,19 @@ class Uniform:
     def upload_data(self):
         if self.var is None:
             raise UnboundLocalError("Variable reference not set.")
-        if self.data_type == "int" or self.data_type == "bool":
+        if self.data_type is Uniform.Type.INT:
             glUniform1i(self.var, self.data)
-        elif self.data_type == "float":
+        elif self.data_type is Uniform.Type.FLOAT:
             glUniform1f(self.var, self.data)
-        elif self.data_type == "vec2":
+        elif self.data_type is Uniform.Type.VEC2:
             glUniform2f(self.var, *self.data)
-        elif self.data_type == "vec3":
+        elif self.data_type is Uniform.Type.VEC3:
             glUniform3f(self.var, *self.data)
-        elif self.data_type == "vec4":
+        elif self.data_type is Uniform.Type.VEC4:
             glUniform4f(self.var, *self.data)
-        elif self.data_type == "mat4":
+        elif self.data_type is Uniform.Type.MAT4:
             glUniformMatrix4fv(self.var, 1, GL_TRUE, self.data)
-        elif self.data_type == "sampler2D":
+        elif self.data_type is Uniform.Type.SAMPLER2D:
             obj, unit = self.data
             glActiveTexture(GL_TEXTURE0 + unit)
             glBindTexture(GL_TEXTURE_2D, obj)
@@ -139,16 +157,18 @@ class Uniform:
 
 class Texture:
     def __init__(self, filename: str = None, properties: dict[str, Constant] = None):
-        self.surface: pygame.surface.Surface | None = None
+        self.w, self.h = 0, 0
+        self.data: str | None = None
         self.tex = glGenTextures(1)
-        self.properties = {"magFilter": GL_LINEAR, "minFilter": GL_LINEAR_MIPMAP_LINEAR, "wrap": GL_CLAMP_TO_BORDER}
+        self.properties = {"magFilter": GL_LINEAR, "minFilter": GL_LINEAR_MIPMAP_LINEAR, "wrap": GL_CLAMP_TO_BORDER, "informat": GL_RGBA, "format": GL_RGBA}
         self.set_properties(properties)
         if filename is not None:
-            self.load_image(filename)
+            self.load_image(pygame.image.load(filename))
             self.upload()
 
-    def load_image(self, filename: str):
-        self.surface = pygame.image.load(filename)
+    def load_image(self, surface: pygame.Surface):
+        self.w, self.h = surface.get_size()
+        self.data = pygame.image.tostring(surface, "RGBA", True)
 
     def set_properties(self, properties):
         if properties is not None:
@@ -159,10 +179,8 @@ class Texture:
                     raise RuntimeError("Texture has no property", k)
 
     def upload(self):
-        w, h = self.surface.get_size()
-        data = pygame.image.tostring(self.surface, "RGBA")
         glBindTexture(GL_TEXTURE_2D, self.tex)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data)
+        glTexImage2D(GL_TEXTURE_2D, 0, self.properties["informat"], self.w, self.h, 0, self.properties["format"], GL_UNSIGNED_BYTE, self.data)
         glGenerateMipmap(GL_TEXTURE_2D)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, self.properties["magFilter"])
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, self.properties["minFilter"])

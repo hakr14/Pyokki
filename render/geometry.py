@@ -15,7 +15,7 @@ class Geometry:
                 return
         raise RuntimeError("No sized attribute found")
 
-    def add_attribute(self, data_type: str, var_name: str, data: list|tuple|int|float):
+    def add_attribute(self, data_type: Attribute.Type, var_name: str, data: list|tuple|int|float):
         self.attributes[var_name] = Attribute(data_type, data)
 
 class Rectangle(Geometry):
@@ -36,9 +36,9 @@ class Rectangle(Geometry):
         pos = [p0, p1, p3, p0, p3, p2]
         col = [c0, c1, c3, c0, c3, c2]
         tex = [t0, t1, t3, t0, t3, t2]
-        self.add_attribute("vec3", "vertexPosition", pos)
-        self.add_attribute("vec3", "vertexColor", col)
-        self.add_attribute("vec2", "vertexUV", tex)
+        self.add_attribute(Attribute.Type.VEC3, "vertexPosition", pos)
+        self.add_attribute(Attribute.Type.VEC3, "vertexColor", col)
+        self.add_attribute(Attribute.Type.VEC2, "vertexUV", tex)
         self.count_vertices()
 
 class Polygon(Geometry):
@@ -48,9 +48,9 @@ class Polygon(Geometry):
         pos = [p for s in range(sides) for p in [(0, 0, 0), (rad*cos(s*a), rad*sin(s*a), 0), (rad*cos((s+1)*a), rad*sin((s+1)*a), 0)]]
         col = [(1, 1, 1), (0.75, 0.75, 0.75), (0.75, 0.75, 0.75)] * sides
         tex = [p for s in range(sides) for p in [(0.5, 0.5), (cos(s * a) * 0.5 + 0.5, sin(s * a) * 0.5 + 0.5), (cos((s + 1) * a) * 0.5 + 0.5, sin((s + 1) * a) * 0.5 + 0.5)]]
-        self.add_attribute("vec3", "vertexPosition", pos)
-        self.add_attribute("vec3", "vertexColor", col)
-        self.add_attribute("vec2", "vertexUV", tex)
+        self.add_attribute(Attribute.Type.VEC3, "vertexPosition", pos)
+        self.add_attribute(Attribute.Type.VEC3, "vertexColor", col)
+        self.add_attribute(Attribute.Type.VEC2, "vertexUV", tex)
         self.count_vertices()
 
 class Box(Geometry):
@@ -89,9 +89,9 @@ class Box(Geometry):
                c4, c5, c7, c4, c7, c6,
                c1, c0, c2, c1, c2, c3]
         tex = [t0, t1, t3, t0, t3, t2] * 6
-        self.add_attribute("vec3", "vertexPosition", pos)
-        self.add_attribute("vec3", "vertexColor", col)
-        self.add_attribute("vec2", "vertexUV", tex)
+        self.add_attribute(Attribute.Type.VEC3, "vertexPosition", pos)
+        self.add_attribute(Attribute.Type.VEC3, "vertexColor", col)
+        self.add_attribute(Attribute.Type.VEC2, "vertexUV", tex)
         self.count_vertices()
 
 class Parametric(Geometry):
@@ -108,9 +108,9 @@ class Parametric(Geometry):
                 tex.extend([a, b, c, a, c, d])
         pos = list(map(lambda p: func(*p), map(lambda p: (p[0] * (ue - us) + us, p[1] * (ve - vs) + vs), tex)))
         col = [(1, 0, 0), (0, 1, 0), (0, 0, 1), (0, 1, 1), (1, 0, 1), (1, 1, 0)] * ur * vr
-        self.add_attribute("vec3", "vertexPosition", pos)
-        self.add_attribute("vec3", "vertexColor", col)
-        self.add_attribute("vec2", "vertexUV", tex)
+        self.add_attribute(Attribute.Type.VEC3, "vertexPosition", pos)
+        self.add_attribute(Attribute.Type.VEC3, "vertexColor", col)
+        self.add_attribute(Attribute.Type.VEC2, "vertexUV", tex)
         self.count_vertices()
 
 class Plane(Parametric):

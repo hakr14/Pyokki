@@ -1,15 +1,14 @@
 from OpenGL import GL
-from OpenGL.constant import Constant
 from render import Texture, Uniform
-from render.openGL_util import initialize_program
+from render.openGL_util import *
 from typing import Any
 
 class Material:
     def __init__(self, vs_code: str, fs_code: str):
         self.program = initialize_program(vs_code, fs_code)
-        self.uniforms = {"modelMatrix": Uniform("mat4", None),
-                         "viewMatrix": Uniform("mat4", None),
-                         "projectionMatrix": Uniform("mat4", None)}
+        self.uniforms = {"modelMatrix": Uniform(Uniform.Type.MAT4, None),
+                         "viewMatrix": Uniform(Uniform.Type.MAT4, None),
+                         "projectionMatrix": Uniform(Uniform.Type.MAT4, None)}
         self.settings = {"drawStyle": None}
 
     def locate_uniforms(self):
@@ -29,7 +28,7 @@ class Material:
                 else:
                     raise RuntimeError("Material has no property", name)
 
-    def add_uniform(self, data_type: str, name: str, data):
+    def add_uniform(self, data_type: Uniform.Type, name: str, data):
         self.uniforms[name] = Uniform(data_type, data)
 
 class BasicMaterial(Material):
@@ -59,8 +58,8 @@ class BasicMaterial(Material):
             }
         """
         super().__init__(vs_code, fs_code)
-        self.uniforms["baseColor"] = Uniform("vec3", (1, 1, 1))
-        self.uniforms["useVertexColors"] = Uniform("bool", 0)
+        self.add_uniform(Uniform.Type.VEC3, "baseColor", (1, 1, 1))
+        self.add_uniform(Uniform.Type.BOOL, "useVertexColors", 0)
         self.locate_uniforms()
 
     def render_settings(self):
@@ -130,7 +129,7 @@ class TextureMaterial(Material):
             out vec2 uv;
             void main(){
                 gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1);
-                uv = vec2(vertexUV.s, 1 - vertexUV.t);
+                uv = vec2(vertexUV.s, vertexUV.t);
             }
         """
         fs_code = """
@@ -143,8 +142,8 @@ class TextureMaterial(Material):
             }
         """
         super().__init__(vs_code, fs_code)
-        self.add_uniform("vec3", "baseColor", (1, 1, 1))
-        self.add_uniform("sampler2D", "texture", (tex.tex, 1))
+        self.add_uniform(Uniform.Type.VEC3, "baseColor", (1, 1, 1))
+        self.add_uniform(Uniform.Type.SAMPLER2D, "texture", (tex.tex, 1))
         self.locate_uniforms()
         self.settings["drawStyle"] = GL.GL_TRIANGLES
         self.settings["doubleSided"] = False

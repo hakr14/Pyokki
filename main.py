@@ -1,7 +1,5 @@
-from render import Base, Texture
-from render.geometry import Polygon
-from render.materials import TextureMaterial
-from render.objects import Camera, Controller, Mesh, Scene
+from render import Base
+from render.objects import Camera, Controller, Scene, Text
 from render.render import Renderer
 
 class App(Base):
@@ -14,10 +12,7 @@ class App(Base):
         self.renderer = Renderer((1, 1, 1))
         self.scene = Scene()
         self.camera = Camera()
-        geo = Polygon()
-        tex = Texture("images/logo.png")
-        mat = TextureMaterial(tex)
-        self.mesh = Mesh(geo, mat)
+        self.mesh = Text("test")
         self.scene.add(self.mesh)
         self.move = Controller({Controller.Moves.FORWARD: "w", Controller.Moves.BACK: "s",
                                 Controller.Moves.LEFT: "a", Controller.Moves.RIGHT: "d",
