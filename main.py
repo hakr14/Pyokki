@@ -1,3 +1,4 @@
+from objects import TYPES
 from render import Base
 from render.objects import Camera, Controller, Scene, Text
 from render.render import Renderer
@@ -12,7 +13,8 @@ class App(Base):
         self.renderer = Renderer((1, 1, 1))
         self.scene = Scene()
         self.camera = Camera()
-        self.mesh = Text("test")
+        t = TYPES["???"]
+        self.mesh = Text(t.name, color = t.color)
         self.scene.add(self.mesh)
         self.move = Controller({Controller.Moves.FORWARD: "w", Controller.Moves.BACK: "s",
                                 Controller.Moves.LEFT: "a", Controller.Moves.RIGHT: "d",

@@ -4,7 +4,7 @@ from numpy import ndarray
 from numpy.linalg import inv
 from OpenGL import GL
 from operator import truediv
-from pygame.font import Font
+from pygame import image, font, surface
 from render import Input, matrices, Texture
 from render.geometry import Geometry, Rectangle
 from render.materials import Material, TextureMaterial
@@ -175,10 +175,17 @@ class Controller(Object3d):
         if inputs.is_key_pressed(self.keys[Controller.Moves.LOOK_TILT_RIGHT]):
             self.looker.z_rotation(-ta, self.local)
 
-class Text(Mesh):
-    def __init__(self, text: str, font: str = "fonts/verdana.ttf", height: float = 1, color: tuple[int, int, int, int] = (0, 0, 0, 255)):
-        surface = Font(font, 72 * height).render(text, True, color)
+class Surface(Mesh):
+    def __init__(self, surf: surface.Surface, height: float = 1):
         tex = Texture()
-        tex.load_image(surface)
+        tex.load_image(surf)
         tex.upload()
-        super().__init__(Rectangle(truediv(*surface.get_size()) * height, height), TextureMaterial(tex))
+        super().__init__(Rectangle(truediv(*surf.get_size()) * height, height), TextureMaterial(tex))
+
+class Sprite(Surface):
+    def __init__(self, filename: str, height: float = 1):
+        super().__init__(image.load(filename), height)
+
+class Text(Surface):
+    def __init__(self, text: str, fontname: str = "fonts/verdana.ttf", height: float = 1, color: tuple[int, int, int, int] = (0, 0, 0, 255)):
+        super().__init__(font.Font(fontname, int(72 * height)).render(text, True, color), height)
