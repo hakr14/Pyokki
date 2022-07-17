@@ -1,0 +1,8 @@
+Hit Points     |HP |FF0000|HP     |H
+Attack         |ATK|F08030|       |A
+Defense        |DEF|F8D030|       |B
+Special Attack |SPA|6890F0|Sp. Atk|C
+Special Defense|SPD|78C850|Sp. Def|D
+Speed          |SPE|F85888|       |S
+Evasion        |EVA|54E3D0|       | |*
+Accuracy       |ACC|E09238|       | |*

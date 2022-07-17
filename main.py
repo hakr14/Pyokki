@@ -1,4 +1,4 @@
-from objects import TYPES
+from objects import NATURES, STATS, TYPES
 from render import Base
 from render.objects import Camera, Controller, Scene, Text
 from render.render import Renderer
@@ -13,8 +13,10 @@ class App(Base):
         self.renderer = Renderer((1, 1, 1))
         self.scene = Scene()
         self.camera = Camera()
-        t = TYPES["???"]
-        self.mesh = Text(t.name, color = t.color)
+        t = TYPES["Water"]
+        s = STATS["EVA"]
+        n = NATURES["Bashful"]
+        self.mesh = Text(t.name + "\n" + str(n.multipliers[STATS["SPA"]]), color = s.light)
         self.scene.add(self.mesh)
         self.move = Controller({Controller.Moves.FORWARD: "w", Controller.Moves.BACK: "s",
                                 Controller.Moves.LEFT: "a", Controller.Moves.RIGHT: "d",
