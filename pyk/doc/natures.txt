@@ -1,0 +1,6 @@
+natures.pyk is a table with a header representing natures (i.e. a set of stat multipliers).
+The first line is the table header. The first value of this line is assumed to be empty and is ignored.
+The remaining values are abbreviations of Stats.
+The remaining lines are rows of the table.
+The first value of a row is the name of the nature.
+The remaining values of a row are stat multipliers for each of the stats in the header.

@@ -1,0 +1,7 @@
+In Pyokki, .pyk files are treated like special .csv files. They differ from standard CSVs in the following ways:
+* The delimiter between values is the character "|".
+* Leading and trailing whitespace is removed from all values before they are processed.
+* If a "|" is desired within a value, a backslash ("\") may be appended to it.
+* Each line of the file is processed separately.
+* A line with no delimiter instead treats each character as its own value.
+* An empty line is ignored.

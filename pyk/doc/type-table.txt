@@ -1,0 +1,5 @@
+type/table.pyk is a table of type effectiveness.
+The rows represent the attacking type and the columns represent the defending type.
+Both the rows and columns use all types in the order they are defined in type/ptypes.pyk.
+
+NOTE: This implementation assumes that creature types and damage types are the same. It is possible to create a system where they are separate (or rather, such that they act as if they are separate) but it requires some extraneous data in this file.

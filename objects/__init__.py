@@ -13,7 +13,7 @@ for i in range(l):
     t = TYPES[_types[i]]
     e = {}
     for j in range(l):
-        e[TYPES[_types[j]]] = parse_fraction(c[i][0][j])
+        e[TYPES[_types[j]]] = parse_fraction(c[i][j])
     t.eff = e
 
 STATS: dict[str, _objects.Stat] = {}

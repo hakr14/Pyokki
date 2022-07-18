@@ -4,9 +4,9 @@ from operator import truediv
 from pygame.color import Color
 from unicodedata import numeric
 
-def parse_pyk(filename: str) -> tuple[tuple[str | None, ...]]:
+def parse_pyk(filename: str) -> tuple[tuple[str | None, ...], ...]:
     with open(filename, encoding = "UTF-8") as f:
-        return tuple(tuple(e.strip() or None for e in row) for row in reader(f.readlines(), delimiter='|', escapechar='\\'))
+        return tuple(filter(lambda v: v is not None, (tuple(e.strip() or None for e in row) if len(row) > 1 else tuple(row[0].strip()) if len(row) == 1 else None for row in reader(f.readlines(), delimiter='|', escapechar='\\'))))
 
 def parse_fraction(frac: str):
     if len(frac) == 1:

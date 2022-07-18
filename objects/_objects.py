@@ -41,7 +41,7 @@ class Nature:
         for i in range(len(keys)):
             m = 1
             try:
-                if mults[i] != "":
+                if mults[i] is not None:
                     m = parse_fraction(mults[i])
             except IndexError:
                 pass
