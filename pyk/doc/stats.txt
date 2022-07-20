@@ -1,10 +1,7 @@
 Each line of stats.pyk should be of the following format:
 
-Name|Abbreviation|Color|Short Name|Symbol|Hidden
+Name | Abbreviation | Color | Short Name | Symbol
 
 If Short Name is empty, the short name of the stat will be the full name of the stat.
 Symbol is expected to be a single character.
 If Symbol is empty, the stat is assumed to have no symbol.
-Hidden is an indication that the stat should not be represented in a stats layout of a creature.
-If Hidden has any value, the stat is considered hidden.
-If Hidden is empty or missing, the stat is assumed to not be hidden.

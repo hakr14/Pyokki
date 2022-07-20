@@ -1,0 +1,12 @@
+Each line of moves.pyk should be of the following format:
+
+Name | Type | Category | PP | Power | Accuracy | Target | Wide | Flags | Additional
+
+Type is a damage type defined in type/ptypes.pyk.
+Category is a move category defined in categories.pyk.
+PP and power are integers.
+Accuracy is an integer representing the percentage accuracy of the move.
+Target is explained in moves-target.txt.
+Wide is a flag determining if the move hits all available targets.
+Flags is a collection of single character flags. These are stored for use in "Additional", and in many other places (such as item interaction and abilities).
+Additional is not yet implemented.

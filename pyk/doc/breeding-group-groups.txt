@@ -1,0 +1,7 @@
+Each line of breeding/group/groups.pyk should be of the following format:
+
+Name | Color | Only
+
+Only is a flag that only group requirements should be considered for breeding (i.e. gender requirements are ignored).
+
+Breeding compatibilities are handled separately in breeding/group/table.pyk.

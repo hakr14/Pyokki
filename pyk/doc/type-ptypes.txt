@@ -3,4 +3,3 @@ Each line of type/ptypes.pyk should be of the following format:
 Name | Color
 
 Type effectivenesses are handled separately in type/table.pyk.
-The first line in the file will be the default in case of an error. It is recommended to make this an error type for ease of debugging.

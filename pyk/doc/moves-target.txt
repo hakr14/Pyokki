@@ -1,0 +1,27 @@
+Target is a 6 bitfield describing which of 6 places a move is capable of hitting. The below diagram shows the user as "s", allies as "a", and foes as "f":
+
+f f f
+s a a
+
+(These positions are reflected to the left of the user if needed.)
+The positions are indicated by the following bits:
+
+1 3 5
+0 2 4
+
+Meaning the number is obtained by added the numbers of the applicable positions:
+
+2 8 32
+1 4 16
+
+Some useful values:
+ 1: Self
+ 4: Adjacent allies
+ 5: Self and adjacent allies
+10: Adjacent foes
+14: Adjacent
+20: Allies
+21: Self and allies
+42: Foes
+62: All but user
+63: All

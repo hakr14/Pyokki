@@ -1,0 +1,5 @@
+breeding/gender/table.pyk is a table of gender breeding compatibilities.
+Each row and column represents a gender, and each spot represents whether the row gender is compatible with the column gender.
+Both the rows and columns use all genders in the order they are defined in breeding/gender/genders.pyk.
+
+WARNING: This implementation assumes that breeding compatibilities are symmetric. Behavior for non-diagonally-symmetric tables is not defined.

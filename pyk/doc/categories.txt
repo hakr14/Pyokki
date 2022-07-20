@@ -1,0 +1,3 @@
+Each line of categories.pyk should be of the following format:
+
+Name | Color

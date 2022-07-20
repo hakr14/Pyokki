@@ -92,6 +92,29 @@ class Mesh(Object3d):
             a.assoc_var(material.program, v)
         GL.glBindVertexArray(0)
 
+class Renderer:
+    def __init__(self, clear_color = (0, 0, 0)):
+        GL.glEnable(GL.GL_DEPTH_TEST)
+        GL.glClearColor(*clear_color, 1)
+        GL.glEnable(GL.GL_BLEND)
+        GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
+
+    @staticmethod
+    def render(scene: Scene, camera: Camera):
+        GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
+        camera.update_view()
+        for obj in scene.descendants():
+            if isinstance(obj, Mesh) and obj.visible:
+                GL.glUseProgram(obj.material.program)
+                GL.glBindVertexArray(obj.vao)
+                obj.material.uniforms["modelMatrix"].data = obj.global_transform()
+                obj.material.uniforms["viewMatrix"].data = camera.view
+                obj.material.uniforms["projectionMatrix"].data = camera.projection
+                for u in obj.material.uniforms.values():
+                    u.upload_data()
+                obj.material.render_settings()
+                GL.glDrawArrays(obj.material.settings["drawStyle"], 0, obj.geometry.vertex_count)
+
 class Controller(Object3d):
     class Moves(Enum):
         FORWARD         =  1

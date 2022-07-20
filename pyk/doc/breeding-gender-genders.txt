@@ -1,0 +1,11 @@
+Each line of breeding/gender/genders.pyk should be of the following format:
+
+Name | Color | Priority | Only
+
+Priority is an integer representing which parent's species should be passed to offspring.
+For example, in a breeding between two genders of order 1 and 2, the offspring will have the species of the parent with gender priority 2.
+Priority is also used for other purposes in breeding, such as determining which compatibility list to use for breeding groups (see breeding-group-table.txt).
+
+Only is a flag that only gender requirements should be considered for breeding (i.e. group requirements are ignored).
+
+Breeding compatibilities are handled separately in breeding/gender/table.pyk.

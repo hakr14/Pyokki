@@ -1,7 +1,6 @@
-from objects import NATURES, STATS, TYPES
+from objects import MOVES
 from render import Base
-from render.objects import Camera, Controller, Scene, Text
-from render.render import Renderer
+from render.objects import Camera, Controller, Renderer, Scene, Text
 
 class App(Base):
     def __init__(self):
@@ -13,10 +12,8 @@ class App(Base):
         self.renderer = Renderer((1, 1, 1))
         self.scene = Scene()
         self.camera = Camera()
-        t = TYPES["Water"]
-        s = STATS["EVA"]
-        n = NATURES["Bashful"]
-        self.mesh = Text(t.name + "\n" + str(n.multipliers[STATS["SPA"]]), color = s.light)
+        m = MOVES["Pound"]
+        self.mesh = Text(str(m.flags), color = m.type.color)
         self.scene.add(self.mesh)
         self.move = Controller({Controller.Moves.FORWARD: "w", Controller.Moves.BACK: "s",
                                 Controller.Moves.LEFT: "a", Controller.Moves.RIGHT: "d",

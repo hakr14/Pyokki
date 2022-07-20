@@ -1,0 +1,6 @@
+breeding/group/table.pyk is a table of group breeding compatibilities.
+Each row and column represents a group, and each spot represents whether the row group is compatible with the column group.
+The row represents the group of the parent with the gender with higher priority.
+Both the rows and columns use all genders in the order they are defined in breeding/group/groups.pyk.
+
+WARNING: This implementation assumes all compatible genders have different priorities. Behavior for breeding with two genders of the same priority is not defined.

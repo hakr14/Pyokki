@@ -1,0 +1,4 @@
+levels.pyk is a table of experience points required for each leveling rate to reach certain levels.
+Each column represents a leveling rate, with the first row being the name of the leveling rate and each row after being the experience points required to reach the level of the line number in that leveling rate.
+It is assumed that level 1 requires 0 experience points.
+An empty or missing value in a column is interpreted to mean that the previous level is the maximum level of that leveling rate.
